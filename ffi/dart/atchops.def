@@ -1,0 +1,3 @@
+LIBRARY atchops
+EXPORTS
+  atchops_aesctr_encrypt

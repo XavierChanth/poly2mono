@@ -17,3 +17,8 @@ scripts:
       git submodule update --init --remote -- "$i"
     done;
   postupdate: melos bootstrap
+  ffi: |
+    cd $MELOS_ROOT_PATH/ffi/dart || exit 1
+    cmake -B build -S .
+    cmake --build build
+    dart run ffigen
