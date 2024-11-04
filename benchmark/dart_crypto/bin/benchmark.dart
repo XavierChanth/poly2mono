@@ -6,27 +6,6 @@ import 'package:at_chops/at_chops.dart';
 import 'package:chalk/chalk.dart';
 import 'package:dart_crypto/algorithms.dart';
 
-bool compare(Uint8List a, Uint8List b) {
-  bool same = a.length == b.length;
-  if (same) {
-    try {
-      for (int i = 0; i < a.length; i++) {
-        if (a[i] != b[i]) {
-          same = false;
-          break;
-        }
-      }
-    } catch (_) {
-      same = false;
-    }
-  }
-  return same;
-}
-
-String coloredBool(bool same) {
-  return (same) ? chalk.green("true") : chalk.red("false");
-}
-
 Future<void> main(args) async {
   int? nBytes;
   if (args.length > 0) {
@@ -40,7 +19,11 @@ Future<void> main(args) async {
   int byteSize = pow(2, 8).toInt() - 1;
   late Uint8List plainText;
   if (nBytes == null) {
-    plainText = Uint8List.fromList(args[0].codeUnits);
+    if (args.length > 0) {
+      plainText = Uint8List.fromList(args[0].codeUnits);
+    } else {
+      nBytes = defaultNBytes;
+    }
   } else {
     print("Generating $nBytes bytes...");
     var random = Random.secure();
@@ -71,12 +54,19 @@ Future<void> main(args) async {
   Map<String, Uint8List> cipherResults = {};
   Map<String, Uint8List> decryptedResults = {};
 
+  bool skipBoring = false;
+  if (plainText.lengthInBytes > 3072) {
+    print("Number of bytes exceeds boring limit, it will be skipped");
+    skipBoring = true;
+  }
+
   print("");
   print("Time checks (ms)");
   print(
       "================================================================================");
   print("algo   \t: enc\tdec\ttotal");
   for (var algo in algorithms.asMap.entries) {
+    if (skipBoring && algo.key == "boring") continue;
     var plainTextClone = Uint8List.fromList(plainText);
 
     // Deep clone - webcrypto uses the same memory
@@ -121,17 +111,43 @@ Future<void> main(args) async {
   print(
       "================================================================================");
   for (var cipherResult in cipherResults.entries) {
-    for (var algo in algorithms.asMap.entries) {
-      if (algo.key == cipherResult.key) continue;
+    for (var algo in cipherResults.keys) {
+      if (algo == cipherResult.key) continue;
       try {
-        decryptedText = await algo.value.decrypt(cipherResult.value, iv: iv);
+        decryptedText =
+            await algorithms.asMap[algo]!.decrypt(cipherResult.value, iv: iv);
         bool same = compare(plainText, decryptedText);
-        print("${cipherResult.key} -> ${algo.key}\t: ${coloredBool(same)}");
+        print("${cipherResult.key} -> $algo\t: ${coloredBool(same)}");
       } catch (_) {
-        print(
-            "${cipherResult.key} -> ${algo.key}\t: ${chalk.red("FAILED DECRYPT")}");
+        print("${cipherResult.key} -> $algo\t: ${chalk.red("FAILED DECRYPT")}");
       }
     }
     print("");
   }
+
+  print("");
+}
+
+// Boring has a limit of 3072 bytes (4096 after base64Encode is applied)
+const int defaultNBytes = 3072;
+
+String coloredBool(bool same) {
+  return (same) ? chalk.green("true") : chalk.red("false");
+}
+
+bool compare(Uint8List a, Uint8List b) {
+  bool same = a.length == b.length;
+  if (same) {
+    try {
+      for (int i = 0; i < a.length; i++) {
+        if (a[i] != b[i]) {
+          same = false;
+          break;
+        }
+      }
+    } catch (_) {
+      same = false;
+    }
+  }
+  return same;
 }
