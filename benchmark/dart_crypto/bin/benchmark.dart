@@ -17,7 +17,7 @@ Future<void> main(args) async {
       "================================================================================");
   print("Arguments: ${args.toString()}");
   int byteSize = pow(2, 8).toInt() - 1;
-  late Uint8List plainText;
+  Uint8List plainText = Uint8List(0);
   if (nBytes == null) {
     if (args.length > 0) {
       plainText = Uint8List.fromList(args[0].codeUnits);
