@@ -5,6 +5,11 @@ pubspec.lock
 .dart_tool/
 .packages
 
+# Compiled dart files
+*.exe
+*.aot
+*.jit
+
 # iPython notebooks
 .ipynb_checkpoints/
 
