@@ -7,9 +7,10 @@ include(FetchContent)
 project(atchops_shared LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
-set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../..)
 set(ATCHOPS_BUILD_TESTS OFF)
+set(CMAKE_BUILD_TESTS OFF)
 set(ATCHOPS_AS_SUBPROJECT ON)
+set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../..)
 
 FetchContent_Declare(
   atchops
@@ -22,7 +23,6 @@ FetchContent_MakeAvailable(atchops)
 add_library(
   ${PROJECT_NAME}
   SHARED
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/atchops.def>
   $<TARGET_OBJECTS:atchops>
   $<TARGET_OBJECTS:atlogger>
   $<TARGET_OBJECTS:mbedcrypto>
@@ -32,7 +32,7 @@ add_library(
 
 set_target_properties(
   ${PROJECT_NAME}
-  PROPERTIES SOVERSION 1 OUTPUT_NAME "atchops"
+  PROPERTIES SOVERSION 1 OUTPUT_NAME "atchops" LINKER_LANGUAGE C
 )
 
 if(WIN32)
