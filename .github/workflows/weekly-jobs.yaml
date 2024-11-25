@@ -39,7 +39,7 @@ jobs:
           ref: ${{ needs.build_branch.outputs.branch_name }}
           submodules: true
 
-      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 #v2.16.0
+      - uses: subosito/flutter-action@74af56c5ed2697ba4621264652728e8d217e53d3 #v2.17.0
         with:
           channel: "stable"
           cache: ${{ needs.build_branch.outputs.build_id != '' }}
