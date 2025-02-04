@@ -53,6 +53,9 @@ jobs:
 
       - uses: ./.github/composite/update-submodules
 
+      - name: Force update Flutter SDK packages
+        run: flutter update-packages --force-upgrade
+
       - name: Install melos
         run: dart pub get
         shell: bash
@@ -130,8 +133,7 @@ jobs:
       - name: Upload dependency report
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
-          name:
-            at_mono_dependency_reports_${{
+          name: at_mono_dependency_reports_${{
             needs.build_branch.outputs.branch_name }}
           path: ./dependency_reports/
           if-no-files-found: error

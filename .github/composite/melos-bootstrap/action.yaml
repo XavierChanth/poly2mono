@@ -14,10 +14,14 @@ runs:
   steps:
     - uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 #v2.12.0
       with:
-        channel: 'stable'
+        channel: "stable"
         cache: ${{ inputs.build_id != '' }}
         cache-key: ${{ inputs.build_id }}
 
+    - name: Force update Flutter SDK packages
+      run: flutter update-packages --force-upgrade
+
+      shell: bash
     - name: Install melos
       run: dart pub get
       shell: bash
@@ -26,7 +30,7 @@ runs:
       if: ${{ inputs.build_id != '' }}
       uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
       with:
-        path: '**/pubspec.lock'
+        path: "**/pubspec.lock"
         key: ${{ inputs.build_id }}
 
     - name: Bootstrap project with melos
